@@ -130,13 +130,6 @@ _get_dependencies() {
                 command=unar; pkg_manager=zypper"
             ;;
         "unrar") dependencies+="command=unrar" ;;
-        "unsquashfs")
-            dependencies+="
-            command=unsquashfs; pkg_manager=apt; package=squashfs-tools |
-            command=unsquashfs; pkg_manager=dnf; package=squashfs-tools |
-            command=unsquashfs; pkg_manager=pacman; package=squashfs-tools |
-            command=unsquashfs; pkg_manager=zypper; package=squashfs"
-            ;;
         "unzip") dependencies+="command=unzip" ;;
         "xorriso") dependencies+="command=xorriso" ;;
         "xz")
@@ -196,7 +189,6 @@ _get_command() {
     *.pak) preferred_commands="unar" ;;
     *.rar) preferred_commands="unrar unar bsdtar" ;;
     *.sit) preferred_commands="unar" ;;
-    *.sqsh | *.squashfs | *.sfs) preferred_commands="unsquashfs" ;;
     *.tar | *.gtar | *.gem) preferred_commands="tar bsdtar unar 7za" ;;
     *.xar) preferred_commands="unar bsdtar" ;;
     *.xz) preferred_commands="xz unar 7za" ;;
@@ -347,7 +339,6 @@ _run_command() {
             exit_code=$?
         fi
         ;;
-    "unsquashfs") std_output=$(unsquashfs "$input_file" 2>&1) ;;
     "unzip")
         std_output=$(unzip -P "null" -- "$input_file" 2>&1)
         exit_code=$?
@@ -438,9 +429,6 @@ _run_command() {
         # For archives with "one item with the same name of the archive".
         # For example: "README.txt.tar.gz" or "README.tar.gz".
         _move_file "rename" "$temp_dir_output/$single_root_item" "$output_dir/$single_root_item"
-    elif [[ "$single_root_item" == "squashfs-root" ]] && [[ "$command" == "unsquashfs" ]]; then
-        # For the "squashfs" archive format.
-        _move_file "rename" "$temp_dir_output/$single_root_item" "$output_dir/$filename"
     else
         # For archives with "one item with a different name of the archive" or "multiple items".
         _move_file "rename" "$temp_dir_output" "$output_dir/$filename"
