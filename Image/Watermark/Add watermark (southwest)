@@ -20,7 +20,9 @@ _main() {
     output_dir=$(_get_output_dir "par_use_same_dir=false")
 
     sleep 0.2 # Avoid 'wait_box' open before.
-    TEMP_DATA_TASK=$(_display_file_selection_box "Image files | *.bmp *.gif *.png *.jpg *.jpeg *.tif")
+    TEMP_DATA_TASK=$(_display_file_selection_box \
+        "Image files | *.bmp *.gif *.png *.jpg *.jpeg *.tif" \
+        "Choose an image to use as the watermark")
 
     # Execute the function '_main_task' for each file in parallel.
     _run_task_parallel "$input_files" "$output_dir"
@@ -32,7 +34,7 @@ _main_task() {
     local output_dir=$2
     local output_file=""
     local std_output=""
-    local gravity="southeast"
+    local gravity="southwest"
 
     # Run the main process.
     output_file=$(_get_output_filename "$input_file" "$output_dir" "par_extension_opt=preserve")

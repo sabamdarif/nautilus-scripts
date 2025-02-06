@@ -15,9 +15,14 @@ _main() {
         command=convert; pkg_manager=dnf; package=ImageMagick |
         command=convert; pkg_manager=pacman; package=imagemagick |
         command=convert; pkg_manager=zypper; package=ImageMagick"
-    _display_wait_box "2"
+    _display_wait_box "0"
     input_files=$(_get_files "par_type=file; par_select_mime=image/")
     output_dir=$(_get_output_dir "par_use_same_dir=false")
+
+    sleep 0.2 # Avoid 'wait_box' open before.
+    TEMP_DATA_TASK=$(_display_file_selection_box \
+        "Image files | *.bmp *.gif *.png *.jpg *.jpeg *.tif" \
+        "Choose an image to use as the watermark")
 
     # Execute the function '_main_task' for each file in parallel.
     _run_task_parallel "$input_files" "$output_dir"
@@ -29,16 +34,12 @@ _main_task() {
     local output_dir=$2
     local output_file=""
     local std_output=""
+    local gravity="southeast"
 
     # Run the main process.
-    local count=1
-    local i=0
-    for ((i = 100 + 30; i < 300; i += 30)); do
-        output_file=$(_get_output_filename "$input_file" "$output_dir" "par_extension_opt=preserve; par_suffix='($count)'")
-        std_output=$(convert "$input_file" -define modulate:colorspace=HSB -modulate "100,100,$i" "$output_file" 2>&1)
-        _check_output "$?" "$std_output" "$input_file" "$output_file" || return 1
-        ((count++))
-    done
+    output_file=$(_get_output_filename "$input_file" "$output_dir" "par_extension_opt=preserve")
+    std_output=$(convert "$input_file" "$TEMP_DATA_TASK" -gravity "$gravity" -composite "$output_file" 2>&1)
+    _check_output "$?" "$std_output" "$input_file" "$output_file" || return 1
 }
 
 _main "$@"

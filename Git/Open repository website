@@ -31,7 +31,7 @@ _convert_git_to_web_url() {
     #          ssh://git@github.com/user/repo.git)
     #        - Git protocol (e.g., git://github.com/user/repo.git)
 
-    local git_url="$1"
+    local git_url=$1
     local web_url=""
 
     git_url=${git_url//@ssh\./@}
@@ -52,7 +52,7 @@ _convert_git_to_web_url() {
         return 1
     fi
 
-    echo "$web_url"
+    printf "%s" "$web_url"
 }
 
 _open_repository_website() {
@@ -63,9 +63,9 @@ _open_repository_website() {
     #   - $1 (input_file): A space-separated list of directories to process.
 
     local input_files=$1
-    local input_file=""
 
     # Iterate over each input file (directory).
+    local input_file=""
     for input_file in $input_files; do
 
         # Check if the current directory is a Git repository.
