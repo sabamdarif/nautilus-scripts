@@ -61,24 +61,16 @@ _compare() {
         fi
         _compare_imagemagick "$file_1" "$file_2"
         ;;
-    "diffpdf")
-        # Use 'diffpdf' for comparing PDF files.
-        if ((num_files_compare > 2)); then
-            _display_error_box "You must select only two PDFs to compare!"
-            _exit_script
-        fi
-        diffpdf -- "$file_1" "$file_2" &
-        ;;
-    "meld" | "kdiff3")
-        # Use 'meld' or 'kdiff3' for general file or directory comparison.
+    "meld")
+        # Use 'meld' for general file or directory comparison.
         if ((num_files_compare == 2)); then
-            $command -- "$file_1" "$file_2" &
+            meld -- "$file_1" "$file_2" &
         else
-            $command -- "$file_1" "$file_2" "$file_3" &
+            meld -- "$file_1" "$file_2" "$file_3" &
         fi
         ;;
-    *"_hex")
-        # Use a hex comparison tool for binary files.
+    "ghex_hex")
+        # Use 'ghex' for hex editing.
         if ((num_files_compare > 2)); then
             _display_error_box "You must select only two binary files to compare!"
             _exit_script
@@ -93,7 +85,7 @@ _compare_hexa() {
     # modifications. It converts files to hex view, compares them, and allows
     # editing or saving changes.
 
-    local command=$1 # Command to use for comparison (e.g., 'meld').
+    local command=$1 # Command to use for comparison (e.g., 'ghex').
     local file_1=$2  # First binary file to compare.
     local file_2=$3  # Second binary file to compare.
 
@@ -128,7 +120,10 @@ _compare_hexa() {
     sed -i "s|^[^:]*: ||g" "$file_2_hex"
 
     # Use the specified comparison command to compare or edit the hex dumps.
-    $command -- "$file_1_hex" "$file_2_hex"
+    $command "$file_1_hex" &
+    $command "$file_2_hex" &
+
+    wait
 
     # Simplify the hex dumps for further processing (plain hex dump format).
     sed -i "s|  .*||g; s| ||g" "$file_1_hex"
@@ -221,17 +216,8 @@ _compare_imagemagick() {
         compare -- "$file_1" "$file_2" -compose src "$temp_file"
     fi
 
-    # Determine the default image viewer to display the visual diff.
-    local image_viewer=""
-    image_viewer=$(_xdg_get_default_app "image/jpeg")
-
-    # Open the visual diff with the default image viewer.
-    if [[ "$image_viewer" == *"eog" ]]; then
-        # If the viewer is Eye of GNOME (eog), ensure a new instance is opened.
-        $image_viewer --new-instance -- "$temp_file"
-    else
-        $image_viewer -- "$temp_file"
-    fi
+    # Open the visual diff using xdg-open
+    xdg-open "$temp_file"
 }
 
 _get_command() {
@@ -249,7 +235,6 @@ _get_command() {
 
     # Select preferred commands based on the file MIME type.
     case $file_mime in
-    "application/pdf") command="diffpdf" ;;
     "inode/directory") command="meld" ;;
     "inode/x-empty") command="meld" ;;
     "image/"*) command="compare" ;;
@@ -259,8 +244,8 @@ _get_command() {
         local file_encoding=""
         file_encoding=$(_get_file_encoding "$input_file")
         if [[ "$file_encoding" == "binary" ]]; then
-            # Binary file comparison.
-            command="meld_hex"
+            # Binary file comparison using ghex
+            command="ghex_hex"
         else
             # Default to text comparison.
             command="meld"
@@ -287,13 +272,9 @@ _get_dependencies() {
         command=compare; pkg_manager=pacman; package=imagemagick |
         command=compare; pkg_manager=zypper; package=ImageMagick |
         command=xdg-open; package=xdg-utils" ;;
-    "diffpdf") dependencies="command=diffpdf" ;;
-    "kdiff3") dependencies="command=kdiff3" ;;
-    "kdiff3_hex") dependencies="command=kdiff3 | command=xxd" ;;
     "meld") dependencies="command=meld" ;;
-    "meld_hex") dependencies="command=meld | command=xxd" ;;
+    "ghex_hex") dependencies="command=ghex | command=xxd" ;;
     esac
-
     printf "%s" "$dependencies"
 }
 
@@ -336,7 +317,6 @@ _get_difference() {
 
 _get_file_size() {
     # This function returns the size of a file in bytes.
-
     stat --format="%s" "$1" 2>/dev/null
 }
 
