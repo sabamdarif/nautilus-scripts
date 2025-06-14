@@ -1,4 +1,6 @@
-# Enhanced File Manager Actions for Linux
+# Enhanced File Manager Actions for Linux (Termux)
+# This is a fork of [cfgnunes/nautilus-scripts](https://github.com/cfgnunes/nautilus-scripts) which i optimized to work better under termux 
+# I really didn't do much so all the credit goes to cfgnunes/nautilus-scripts
 
 This project offers a collection of file manager actions, also known as Nautilus Scripts, designed to enhance the functionality of file managers. With intuitive right-click options for files and directories, it simplifies tasks, boosts productivity, and provides a more efficient workflow.
 
@@ -12,14 +14,6 @@ Compatible with file managers:
 - [Thunar](https://gitlab.xfce.org/xfce/thunar)
 
 ![screenshot](.assets/screenshot.png)
-
-## Installing
-
-To install, just run the following command in the terminal:
-
-```sh
-bash install.sh
-```
 
 ## Advantages
 
