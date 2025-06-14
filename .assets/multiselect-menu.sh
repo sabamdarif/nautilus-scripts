@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/data/data/com.termux/files/usr/bin/bash
 
 # Code based on: https://unix.stackexchange.com/a/673436
 # Version: 2025-01-27

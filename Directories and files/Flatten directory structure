@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/data/data/com.termux/files/usr/bin/bash
 
 # Source the script 'common-functions.sh'.
 SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
@@ -79,7 +79,7 @@ _make_undo_script() {
 
     # Create the undo script with a header and usage instructions.
     {
-        printf "%s\n" "#!/usr/bin/env bash"
+        printf "%s\n" "#!/data/data/com.termux/files/usr/bin/bash"
         printf "\n"
         printf "%s\n" "# This script is automatically generated to reverse the directory flattening"
         printf "%s\n" "# process. It restores the original directory structure and moves files back to"

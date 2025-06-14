@@ -1,0 +1,59 @@
+#!/data/data/com.termux/files/usr/bin/bash
+# shellcheck disable=SC2001
+# install_keyboard_shortcut=<Control><Shift>U
+
+# Source the script 'common-functions.sh'.
+SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
+ROOT_DIR=$(grep --only-matching "^.*scripts[^/]*" <<<"$SCRIPT_DIR")
+source "$ROOT_DIR/common-functions.sh"
+
+_main() {
+    local input_files=""
+    local std_output=""
+    local temp_file=""
+
+    # Execute initial checks.
+    _check_dependencies "command=rdfind"
+    _display_wait_box "2"
+    input_files=$(_get_files "par_type=all; par_get_pwd=true")
+
+    # Work on a temporary file.
+    temp_file=$(_get_temp_file)
+
+    # NOTE: The 'rdfind' does not support ' -- ' in the command line.
+
+    # Run the main process.
+    # shellcheck disable=SC2086
+    rdfind -dryrun true -removeidentinode false -outputname "$temp_file" $input_files &>/dev/null
+
+    # FORMAT THE OUTPUT:
+    # Extract lines containing "DUPTYPE".
+    std_output=$(grep "DUPTYPE" <"$temp_file")
+    # Add a newline before each "DUPTYPE_FIRST_OCCURRENCE" for better readability.
+    std_output=$(sed "s|DUPTYPE_FIRST_OCCURRENCE|\nDUPTYPE_FIRST_OCCURRENCE|" <<<"$std_output")
+    # Retain only the file paths starting from the 8th field in each line.
+    std_output=$(cut -d ' ' -f 8- <<<"$std_output")
+    # Exclude files located in ".git" directories.
+    std_output=$(grep -v "/\.git/" <<<"$std_output")
+    # Remove leading empty lines. Replace 3+ consecutive newlines with 2 newlines.
+    std_output=$(sed -z "s|^\n*\([^\n]\)|\1|g; s|\n\{3,\}|\n\n|g" <<<"$std_output")
+    # Remove any occurrence of the current working directory.
+    std_output=$(_text_remove_pwd "$std_output")
+    # Replace double slashes "//" with a single slash "/".
+    std_output=$(sed "s|//|/|" <<<"$std_output")
+    # Wrap each file path in double quotes for clarity.
+    std_output=$(sed "s|^\(..*\)$|\"\1\"|" <<<"$std_output")
+
+    # Add a "Duplicate files:" header to each group of duplicate files.
+    if [[ -n "$std_output" ]]; then
+        local msg_duplicate="Duplicate files:"
+        std_output="$msg_duplicate"$'\n'"$std_output"
+        std_output=$(sed -z "s|\n\n|\n\n$msg_duplicate\n|g" <<<"$std_output")
+    fi
+
+    rm -f -- "$temp_file"
+
+    _display_text_box "$std_output"
+}
+
+_main "$@"

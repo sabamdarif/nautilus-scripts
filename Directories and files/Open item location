@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/data/data/com.termux/files/usr/bin/bash
 # install_keyboard_shortcut=<Control><Shift>O
 
 # Source the script 'common-functions.sh'.

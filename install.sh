@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/data/data/com.termux/files/usr/bin/bash
 
 # Install the scripts for file managers.
 
@@ -393,7 +393,7 @@ _step_install_dependencies() {
 
     # Fix permissions in ImageMagick to write PDF files.
     local imagemagick_policy=""
-    imagemagick_policy=$(find /etc/ImageMagick-[0-9]*/policy.xml 2>/dev/null)
+    imagemagick_policy=$(find /data/data/com.termux/files/usr/etc/ImageMagick-[0-9]*/policy.xml 2>/dev/null)
     if [[ -f "$imagemagick_policy" ]]; then
         echo -e "$MSG_INFO Fixing write permission with PDF in ImageMagick..."
         sudo sed -i \

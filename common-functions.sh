@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/data/data/com.termux/files/usr/bin/bash
 # shellcheck disable=SC2001
 
 # This file contains common functions that the scripts will source.
@@ -1662,7 +1662,7 @@ _get_output_dir() {
     # Check directories available to put the output dir.
     output_dir=$(_get_working_directory)
     [[ ! -w "$output_dir" ]] && output_dir=$HOME
-    [[ ! -w "$output_dir" ]] && output_dir="/tmp"
+    [[ ! -w "$output_dir" ]] && output_dir="$PREFIX/tmp"
     if [[ ! -w "$output_dir" ]]; then
         _display_error_box "Could not find a directory with write permissions!"
         _exit_script
@@ -2300,13 +2300,6 @@ _pkg_install_packages() {
 
     _display_wait_box_message "Installing the packages. Please, wait..."
 
-    # Install the packages.
-    if ! _command_exists "pkexec"; then
-        _display_error_box \
-            "Could not run the installer with administrator permission!"
-        _exit_script
-    fi
-
     case "$pkg_manager" in
     "apt-get")
         cmd_install="apt-get update;"
@@ -2338,7 +2331,7 @@ _pkg_install_packages() {
         if [[ -n "$post_install" ]]; then
             cmd_install+=";$post_install"
         fi
-        pkexec bash -c "$cmd_install"
+        bash -c "$cmd_install"
     fi
 
     _close_wait_box
@@ -2732,7 +2725,7 @@ _strip_filename_extension() {
     fi
 
     local len_extension=${#extension}
-    printf "%s" "${filename::-len_extension}"
+    printf "%s" "${filename::-$len_extension}"
 }
 
 _text_remove_empty_lines() {
@@ -3139,8 +3132,8 @@ _xdg_get_default_app() {
 
     # Search possible locations for '.desktop' file.
     local search_paths=(
-        "/usr/local/share/applications"
-        "/usr/share/applications"
+        "$PREFIX/local/share/applications"
+        "$PREFIX/share/applications"
     )
 
     for path in "${search_paths[@]}"; do
