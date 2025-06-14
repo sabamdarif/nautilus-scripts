@@ -11,9 +11,9 @@ _main() {
 
     # Execute initial checks.
     _check_dependencies "
-        command=pdfjam; pkg_manager=apt; package=texlive-extra-utils |
+        command=pdfjam; pkg_manager=apt; package=texlive |
         command=pdfjam; pkg_manager=dnf; package=texlive-pdfjam |
-        command=pdfjam; pkg_manager=pacman; package=texlive-binextra |
+        command=pdfjam; pkg_manager=pacman; package=texlive |
         command=pdfjam; pkg_manager=zypper; package=texlive-pdfjam-bin"
     _display_wait_box "2"
     input_files=$(_get_files "par_type=file; par_select_extension=pdf")

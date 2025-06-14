@@ -10,7 +10,7 @@ _main() {
 
     # Execute initial checks.
     _check_dependencies "
-        command=pdfsig; pkg_manager=apt; package=poppler-utils |
+        command=pdfsig; pkg_manager=apt; package=poppler |
         command=pdfsig; pkg_manager=dnf; package=poppler-utils |
         command=pdfsig; pkg_manager=pacman; package=poppler |
         command=pdfsig; pkg_manager=zypper; package=poppler-tools"
