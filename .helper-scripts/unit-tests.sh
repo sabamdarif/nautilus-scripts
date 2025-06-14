@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/data/data/com.termux/files/usr/bin/bash
 
 # Unit test script.
 
@@ -8,7 +8,7 @@ set -u
 # CONSTANTS
 # -----------------------------------------------------------------------------
 
-_TEMP_DIR_TEST="/tmp/unit-test"
+_TEMP_DIR_TEST="/data/data/com.termux/files/usr/tmp/unit-test"
 _TEMP_FILE1="$_TEMP_DIR_TEST/file1"
 _TEMP_FILE2="$_TEMP_DIR_TEST/file2"
 _TEMP_FILE3="$_TEMP_DIR_TEST/file3"
@@ -151,32 +151,32 @@ _run_get_filename_extension() {
     output=$(_get_filename_extension "$input")
     _test_equal "$input" "$output" "$expected_output"
 
-    input="/tmp/File.txt"
+    input="/data/data/com.termux/files/usr/tmp/File.txt"
     expected_output=".txt"
     output=$(_get_filename_extension "$input")
     _test_equal "$input" "$output" "$expected_output"
 
-    input="/tmp/.File.txt"
+    input="/data/data/com.termux/files/usr/tmp/.File.txt"
     expected_output=".txt"
     output=$(_get_filename_extension "$input")
     _test_equal "$input" "$output" "$expected_output"
 
-    input="/tmp/.File"
+    input="/data/data/com.termux/files/usr/tmp/.File"
     expected_output=""
     output=$(_get_filename_extension "$input")
     _test_equal "$input" "$output" "$expected_output"
 
-    input="/tmp/File.thisisnotanextension"
+    input="/data/data/com.termux/files/usr/tmp/File.thisisnotanextension"
     expected_output=""
     output=$(_get_filename_extension "$input")
     _test_equal "$input" "$output" "$expected_output"
 
-    input="/tmp/File"
+    input="/data/data/com.termux/files/usr/tmp/File"
     expected_output=""
     output=$(_get_filename_extension "$input")
     _test_equal "$input" "$output" "$expected_output"
 
-    input="/tmp/File !@#$%&*()_"$'\n'"+.txt"
+    input="/data/data/com.termux/files/usr/tmp/File !@#$%&*()_"$'\n'"+.txt"
     expected_output=".txt"
     output=$(_get_filename_extension "$input")
     _test_equal "$input" "$output" "$expected_output"
@@ -293,33 +293,33 @@ _run_strip_filename_extension() {
     output=$(_strip_filename_extension "$input")
     _test_equal "$input" "$output" "$expected_output"
 
-    input="/tmp/File.txt"
-    expected_output="/tmp/File"
+    input="/data/data/com.termux/files/usr/tmp/File.txt"
+    expected_output="/data/data/com.termux/files/usr/tmp/File"
     output=$(_strip_filename_extension "$input")
     _test_equal "$input" "$output" "$expected_output"
 
-    input="/tmp/.File.txt"
-    expected_output="/tmp/.File"
+    input="/data/data/com.termux/files/usr/tmp/.File.txt"
+    expected_output="/data/data/com.termux/files/usr/tmp/.File"
     output=$(_strip_filename_extension "$input")
     _test_equal "$input" "$output" "$expected_output"
 
-    input="/tmp/.File"
-    expected_output="/tmp/.File"
+    input="/data/data/com.termux/files/usr/tmp/.File"
+    expected_output="/data/data/com.termux/files/usr/tmp/.File"
     output=$(_strip_filename_extension "$input")
     _test_equal "$input" "$output" "$expected_output"
 
-    input="/tmp/File.thisisnotanextension"
-    expected_output="/tmp/File.thisisnotanextension"
+    input="/data/data/com.termux/files/usr/tmp/File.thisisnotanextension"
+    expected_output="/data/data/com.termux/files/usr/tmp/File.thisisnotanextension"
     output=$(_strip_filename_extension "$input")
     _test_equal "$input" "$output" "$expected_output"
 
-    input="/tmp/File"
-    expected_output="/tmp/File"
+    input="/data/data/com.termux/files/usr/tmp/File"
+    expected_output="/data/data/com.termux/files/usr/tmp/File"
     output=$(_strip_filename_extension "$input")
     _test_equal "$input" "$output" "$expected_output"
 
-    input="/tmp/File !@#$%&*()_"$'\n'"+.txt"
-    expected_output="/tmp/File !@#$%&*()_"$'\n'"+"
+    input="/data/data/com.termux/files/usr/tmp/File !@#$%&*()_"$'\n'"+.txt"
+    expected_output="/data/data/com.termux/files/usr/tmp/File !@#$%&*()_"$'\n'"+"
     output=$(_strip_filename_extension "$input")
     _test_equal "$input" "$output" "$expected_output"
 }

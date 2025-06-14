@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/data/data/com.termux/files/usr/bin/bash
 # shellcheck disable=SC2001
 
 # This file contains common functions that the scripts will source.
@@ -1232,7 +1232,7 @@ _get_output_dir() {
     # Check directories available to put the 'output' dir.
     base_dir=$(_get_working_directory)
     [[ ! -w "$base_dir" ]] && base_dir=$HOME
-    [[ ! -w "$base_dir" ]] && base_dir="/tmp"
+    [[ ! -w "$base_dir" ]] && base_dir="/data/data/com.termux/files/usr/tmp"
     if [[ ! -w "$base_dir" ]]; then
         _display_error_box "Could not find a directory with write permissions!"
         _exit_script
@@ -2579,7 +2579,7 @@ _xdg_get_default_app() {
 
     desktop_file=$(xdg-mime query default "$mime" 2>/dev/null)
 
-    default_app=$(grep -m1 "^Exec" "/usr/share/applications/$desktop_file" |
+    default_app=$(grep -m1 "^Exec" "/data/data/com.termux/files/usr/share/applications/$desktop_file" |
         sed "s|Exec=||g" | cut -d " " -f 1)
 
     if [[ -z "$default_app" ]]; then
