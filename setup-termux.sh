@@ -1,6 +1,12 @@
 #!/data/data/com.termux/files/usr/bin/bash
 
-source /data/data/com.termux/files/usr/etc/termux-desktop/common_functions
+if [[ "$fm_tools_install_from_td_installer" != "true" ]]; then
+    if [[ -f /data/data/com.termux/files/usr/etc/termux-desktop/common_functions ]]; then
+        source /data/data/com.termux/files/usr/etc/termux-desktop/common_functions
+    else
+        echo -e "\033[0;31m[☓]\033[0;31m It looks like common_functions is missing from your system, make sure you install sabamdarif/termux-desktop\033[0m"
+    fi
+fi
 
 SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 readonly SCRIPT_DIR
@@ -34,7 +40,12 @@ step_install_dependencies() {
     echo "${R}[${G}-${R}]${G} Installing the dependencies...${W}"
 
     # Core utilities
-    package_install_and_check "zenity xclip bzip2 gzip tar unzip zip xorriso optipng imagemagick ghostscript qpdf poppler tesseract texlive tesseract ffmpeg rdfind exiftool go-findimagedupes mediainfo mp3gain id3v2 filelight perl rhash pandoc p7zip xz-utils iconv"
+    if [[ "$PACKAGE_MANAGER" == "pacman" ]]; then
+        package_install_and_check "texlive-bin"
+    else
+        package_install_and_check "texlive"
+    fi
+    package_install_and_check "zenity xclip bzip2 gzip tar unzip zip xorriso optipng imagemagick ghostscript qpdf poppler tesseract tesseract ffmpeg rdfind exiftool go-findimagedupes mediainfo mp3gain id3v2 filelight perl rhash pandoc p7zip xz-utils iconv"
 
     # Fix ImageMagick PDF permissions
     local imagemagick_config="/data/data/com.termux/files/usr/etc/ImageMagick-7/policy.xml"
