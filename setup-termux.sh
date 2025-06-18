@@ -38,12 +38,7 @@ step_install_dependencies() {
     echo "${R}[${G}-${R}]${G} Installing the dependencies...${W}"
 
     # Core utilities
-    if [[ "$PACKAGE_MANAGER" == "pacman" ]]; then
-        package_install_and_check "texlive-bin"
-    else
-        package_install_and_check "texlive"
-    fi
-    package_install_and_check "zenity xclip bzip2 gzip tar unzip zip xorriso optipng imagemagick ghostscript qpdf poppler tesseract tesseract ffmpeg rdfind exiftool go-findimagedupes mediainfo mp3gain id3v2 filelight perl rhash pandoc p7zip xz-utils iconv"
+    package_install_and_check "zenity xclip texlive-bin bzip2 gzip tar unzip zip xorriso optipng imagemagick ghostscript qpdf poppler tesseract tesseract ffmpeg rdfind exiftool go-findimagedupes mediainfo mp3gain id3v2 filelight perl rhash pandoc p7zip xz-utils iconv"
 
     # Fix ImageMagick PDF permissions
     local imagemagick_config="/data/data/com.termux/files/usr/etc/ImageMagick-7/policy.xml"
