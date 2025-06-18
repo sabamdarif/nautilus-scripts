@@ -1,11 +1,9 @@
 #!/data/data/com.termux/files/usr/bin/bash
 
-if [[ "$fm_tools_install_from_td_installer" != "true" ]]; then
-    if [[ -f /data/data/com.termux/files/usr/etc/termux-desktop/common_functions ]]; then
-        source /data/data/com.termux/files/usr/etc/termux-desktop/common_functions
-    else
-        echo -e "\033[0;31m[☓]\033[0;31m It looks like common_functions is missing from your system, make sure you install sabamdarif/termux-desktop\033[0m"
-    fi
+if [[ -f /data/data/com.termux/files/usr/etc/termux-desktop/common_functions ]]; then
+    source /data/data/com.termux/files/usr/etc/termux-desktop/common_functions
+else
+    echo -e "\033[0;31m[☓]\033[0;31m It looks like common_functions is missing from your system, make sure you install sabamdarif/termux-desktop\033[0m"
 fi
 
 SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
