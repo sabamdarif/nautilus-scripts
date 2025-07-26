@@ -30,7 +30,8 @@ command_exists() {
     return 1
 }
 
-COMPATIBLE_FILE_MANAGERS=("caja" "pcmanfm-qt" "thunar")
+# Added nautilus to the compatible file managers list
+COMPATIBLE_FILE_MANAGERS=("nautilus" "caja" "pcmanfm-qt" "thunar")
 FILE_MANAGER=""
 INSTALL_DIR=""
 
@@ -57,6 +58,10 @@ setup_file_manager() {
         # Check if the file manager command exists.
         if command_exists "$file_manager"; then
             case "$file_manager" in
+            "nautilus")
+                INSTALL_DIR="$HOME/.local/share/nautilus/scripts"
+                FILE_MANAGER="nautilus"
+                ;;
             "caja")
                 INSTALL_DIR="$HOME/.config/caja/scripts"
                 FILE_MANAGER="caja"
@@ -82,6 +87,34 @@ setup_file_manager() {
     # If no compatible file manager is found, print an error and exit.
     print_failed "Error: could not find any compatible file managers!"
     exit 1
+}
+
+step_install_shortcuts_nautilus() {
+    echo "${R}[${G}-${R}]${G} Installing the keyboard shortcuts for Nautilus...${NC}"
+
+    local accels_file=$1
+    mkdir --parents "$(dirname -- "$accels_file")"
+
+    # Create a backup of older custom actions.
+    check_and_backup "$accels_file"
+    check_and_delete "$accels_file"
+
+    {
+        local filename=""
+        while IFS="" read -r -d "" filename; do
+            local install_keyboard_shortcut=""
+            install_keyboard_shortcut=$(get_script_parameter_value "$filename" "install_keyboard_shortcut")
+
+            if [[ -n "$install_keyboard_shortcut" ]]; then
+                local name=""
+                name=$(basename -- "$filename")
+                printf "%s\n" "$install_keyboard_shortcut $name"
+            fi
+        done < <(find -L "$INSTALL_DIR" -mindepth 2 -type f ! -path "*.git*" ! -path "*.assets*" -print0 2>/dev/null | sort --zero-terminated)
+
+    } >"$accels_file"
+
+    echo "${R}[${G}✓${R}]${G} Nautilus keyboard shortcuts installed successfully${NC}"
 }
 
 step_install_shortcuts_gnome2() {
@@ -169,8 +202,15 @@ step_install_shortcuts() {
     # Install keyboard shortcuts for specific file managers.
 
     case "$FILE_MANAGER" in
-    "caja") step_install_shortcuts_gnome2 "$HOME/.config/caja/accels" ;;
-    "thunar") step_install_shortcuts_thunar "$HOME/.config/Thunar/accels.scm" ;;
+    "nautilus")
+        step_install_shortcuts_nautilus "$HOME/.config/nautilus/scripts-accels"
+        ;;
+    "caja")
+        step_install_shortcuts_gnome2 "$HOME/.config/caja/accels"
+        ;;
+    "thunar")
+        step_install_shortcuts_thunar "$HOME/.config/Thunar/accels.scm"
+        ;;
     esac
 }
 
@@ -332,6 +372,11 @@ step_install_menus() {
     echo "${R}[${G}-${R}]${G} Installing file manager menus...${NC}"
 
     case "$FILE_MANAGER" in
+    "nautilus")
+        # Nautilus uses scripts directly without desktop files
+        # The scripts folder structure is sufficient for menu creation
+        echo "${R}[${G}✓${R}]${G} Nautilus scripts installed (no additional menu setup required)${NC}"
+        ;;
     "pcmanfm-qt")
         step_install_menus_pcmanfm
         ;;
@@ -369,18 +414,26 @@ step_close_filemanager() {
     echo "${R}[${G}-${R}]${G} Closing the file manager to reload its configurations...${NC}"
 
     case "$FILE_MANAGER" in
+    "nautilus")
+        if pgrep -x "$FILE_MANAGER" &>/dev/null; then
+            $FILE_MANAGER -q &>/dev/null || true &
+            sleep 1
+        else
+            echo "${R}[${G}-${R}]${Y} No running instance of $FILE_MANAGER found.${NC}"
+        fi
+        ;;
     "caja" | "thunar")
         if pgrep -x "$FILE_MANAGER" &>/dev/null; then
             $FILE_MANAGER -q &>/dev/null || true &
         else
-            echo "${R}[${G}-${R}]${Y} No running instance of $FILE_MANAGER found."
+            echo "${R}[${G}-${R}]${Y} No running instance of $FILE_MANAGER found.${NC}"
         fi
         ;;
     "pcmanfm-qt")
         if pgrep -x "$FILE_MANAGER" &>/dev/null; then
             killall "$FILE_MANAGER" &>/dev/null || true &
         else
-            echo "${R}[${G}-${R}]${Y} No running instance of $FILE_MANAGER found."
+            echo "${R}[${G}-${R}]${Y} No running instance of $FILE_MANAGER found.${NC}"
         fi
         ;;
     *)
@@ -426,6 +479,12 @@ main() {
     # After scripts are copied, install menus and shortcuts
     step_install_menus || {
         print_failed "Failed to install menus"
+        exit 1
+    }
+
+    # Install keyboard shortcuts
+    step_install_shortcuts || {
+        print_failed "Failed to install shortcuts"
         exit 1
     }
 
