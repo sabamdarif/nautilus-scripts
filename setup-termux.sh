@@ -35,7 +35,7 @@ FILE_MANAGER=""
 INSTALL_DIR=""
 
 step_install_dependencies() {
-    echo "${R}[${G}-${R}]${G} Installing the dependencies...${W}"
+    echo "${R}[${G}-${R}]${G} Installing the dependencies...${NC}"
 
     # Core utilities
     package_install_and_check "zenity xclip texlive-bin bzip2 gzip tar unzip zip xorriso optipng imagemagick ghostscript qpdf poppler tesseract tesseract ffmpeg rdfind exiftool go-findimagedupes mediainfo mp3gain id3v2 filelight perl rhash pandoc p7zip xz-utils iconv"
@@ -43,7 +43,7 @@ step_install_dependencies() {
     # Fix ImageMagick PDF permissions
     local imagemagick_config="/data/data/com.termux/files/usr/etc/ImageMagick-7/policy.xml"
     if [[ -f "$imagemagick_config" ]]; then
-        echo "${R}[${G}-${R}]${G} Fixing write permission with PDF in ImageMagick...${W}"
+        echo "${R}[${G}-${R}]${G} Fixing write permission with PDF in ImageMagick...${NC}"
         sed -i 's/rights="none" pattern="PDF"/rights="read|write" pattern="PDF"/g' "$imagemagick_config"
         sed -i 's/".GiB"/"8GiB"/g' "$imagemagick_config"
     fi
@@ -85,7 +85,7 @@ setup_file_manager() {
 }
 
 step_install_shortcuts_gnome2() {
-    echo "${R}[${G}-${R}]${G} Installing the keyboard shortcuts...${W}"
+    echo "${R}[${G}-${R}]${G} Installing the keyboard shortcuts...${NC}"
 
     local accels_file=$1
     mkdir --parents "$(dirname -- "$accels_file")"
@@ -119,11 +119,11 @@ step_install_shortcuts_gnome2() {
 
     } >"$accels_file"
 
-    echo "${R}[${G}✓${R}]${G} Keyboard shortcuts installed successfully${W}"
+    echo "${R}[${G}✓${R}]${G} Keyboard shortcuts installed successfully${NC}"
 }
 
 step_install_shortcuts_thunar() {
-    echo "${R}[${G}-${R}]${G} Installing the keyboard shortcuts for Thunar...${W}"
+    echo "${R}[${G}-${R}]${G} Installing the keyboard shortcuts for Thunar...${NC}"
 
     local accels_file=$1
     mkdir --parents "$(dirname -- "$accels_file")"
@@ -175,7 +175,7 @@ step_install_shortcuts() {
 }
 
 step_install_menus_pcmanfm() {
-    echo "${R}[${G}-${R}]${G} Installing PCManFM-Qt actions...${W}"
+    echo "${R}[${G}-${R}]${G} Installing PCManFM-Qt actions...${NC}"
 
     local desktop_menus_dir="$HOME/.local/share/file-manager/actions"
     check_and_create_directory "$desktop_menus_dir"
@@ -265,11 +265,11 @@ step_install_menus_pcmanfm() {
         chmod +x "$desktop_filename"
     done < <(find -L "$INSTALL_DIR" -mindepth 2 -type f ! -path "*.git*" ! -path "*.assets*" -print0 2>/dev/null | sort --zero-terminated)
 
-    echo "${R}[${G}✓${R}]${G} PCManFM-Qt menus installed successfully${W}"
+    echo "${R}[${G}✓${R}]${G} PCManFM-Qt menus installed successfully${NC}"
 }
 
 step_install_menus_thunar() {
-    echo "${R}[${G}-${R}]${G} Installing Thunar actions...${W}"
+    echo "${R}[${G}-${R}]${G} Installing Thunar actions...${NC}"
 
     local menus_file="$HOME/.config/Thunar/uca.xml"
     local accels_file="$HOME/.config/Thunar/accels.scm"
@@ -329,7 +329,7 @@ step_install_menus_thunar() {
 
 step_install_menus() {
     # Install menus for specific file managers.
-    echo "${R}[${G}-${R}]${G} Installing file manager menus...${W}"
+    echo "${R}[${G}-${R}]${G} Installing file manager menus...${NC}"
 
     case "$FILE_MANAGER" in
     "pcmanfm-qt")
@@ -350,23 +350,23 @@ step_install_scripts() {
     local tmp_install_dir=""
 
     # 'Remove' previous scripts.
-    echo "${R}[${G}-${R}]${G} Removing previous scripts...${W}"
+    echo "${R}[${G}-${R}]${G} Removing previous scripts...${NC}"
     check_and_delete "$INSTALL_DIR"
 
-    echo "${R}[${G}-${R}]${G} Installing new scripts...${W}"
+    echo "${R}[${G}-${R}]${G} Installing new scripts...${NC}"
     check_and_create_directory "$INSTALL_DIR"
 
     # Copy the script files.
     cp -r "$SCRIPT_DIR"/* "$INSTALL_DIR"
 
     # Set file permissions.
-    echo "${R}[${G}-${R}]${G} Setting file permissions...${W}"
+    echo "${R}[${G}-${R}]${G} Setting file permissions...${NC}"
     find -L "$INSTALL_DIR" -type f ! -path "*.git*" ! -exec chmod -x -- {} \;
     find -L "$INSTALL_DIR" -mindepth 2 -type f ! -path "*.git*" ! -path "*.assets*" -exec chmod +x -- {} \;
 }
 
 step_close_filemanager() {
-    echo "${R}[${G}-${R}]${G} Closing the file manager to reload its configurations...${W}"
+    echo "${R}[${G}-${R}]${G} Closing the file manager to reload its configurations...${NC}"
 
     case "$FILE_MANAGER" in
     "caja" | "thunar")
@@ -396,7 +396,7 @@ check_files_copied_successfully() {
     for item in "$SCRIPT_DIR"/*; do
         local target="$INSTALL_DIR/$(basename "$item")"
         if [[ ! -e "$target" ]]; then
-            echo "${R}[!] Missing: $target${W}"
+            echo "${R}[!] Missing: $target${NC}"
             success=false
         fi
     done
@@ -409,7 +409,7 @@ check_files_copied_successfully() {
 }
 
 main() {
-    echo "${R}[${G}*${R}]${G} Starting installation...${W}"
+    echo "${R}[${G}*${R}]${G} Starting installation...${NC}"
 
     # First check and setup file manager
     setup_file_manager || {
@@ -438,7 +438,7 @@ main() {
     check_files_copied_successfully
 
     print_success "Installation completed successfully!"
-    echo "${R}[${G}*${R}]${G} Please restart your file manager to see the changes${W}"
+    echo "${R}[${G}*${R}]${G} Please restart your file manager to see the changes${NC}"
 }
 
 check_termux
