@@ -30,8 +30,8 @@ command_exists() {
     return 1
 }
 
-# Added nautilus to the compatible file managers list
-COMPATIBLE_FILE_MANAGERS=("nautilus" "caja" "pcmanfm-qt" "thunar")
+# Added nemo to the compatible file managers list
+COMPATIBLE_FILE_MANAGERS=("nautilus" "caja" "nemo" "pcmanfm-qt" "thunar")
 FILE_MANAGER=""
 INSTALL_DIR=""
 
@@ -53,7 +53,6 @@ step_install_dependencies() {
 setup_file_manager() {
     local file_manager=""
 
-    # Loop through compatible file managers.
     for file_manager in "${COMPATIBLE_FILE_MANAGERS[@]}"; do
         # Check if the file manager command exists.
         if command_exists "$file_manager"; then
@@ -66,6 +65,10 @@ setup_file_manager() {
                 INSTALL_DIR="$HOME/.config/caja/scripts"
                 FILE_MANAGER="caja"
                 ;;
+            "nemo")
+                INSTALL_DIR="$HOME/.local/share/nemo/scripts"
+                FILE_MANAGER="nemo"
+                ;;
             "pcmanfm-qt")
                 INSTALL_DIR="$HOME/.local/share/scripts"
                 FILE_MANAGER="pcmanfm-qt"
@@ -76,15 +79,12 @@ setup_file_manager() {
                 ;;
             esac
 
-            # Create the installation directory if it doesn't exist.
             check_and_create_directory "$INSTALL_DIR"
 
-            # Exit the function once a file manager is successfully configured.
             return
         fi
     done
 
-    # If no compatible file manager is found, print an error and exit.
     print_failed "Error: could not find any compatible file managers!"
     exit 1
 }
@@ -199,14 +199,15 @@ step_install_shortcuts_thunar() {
 }
 
 step_install_shortcuts() {
-    # Install keyboard shortcuts for specific file managers.
-
     case "$FILE_MANAGER" in
     "nautilus")
         step_install_shortcuts_nautilus "$HOME/.config/nautilus/scripts-accels"
         ;;
     "caja")
         step_install_shortcuts_gnome2 "$HOME/.config/caja/accels"
+        ;;
+    "nemo")
+        step_install_shortcuts_gnome2 "$HOME/.gnome2/accels/nemo"
         ;;
     "thunar")
         step_install_shortcuts_thunar "$HOME/.config/Thunar/accels.scm"
@@ -314,10 +315,8 @@ step_install_menus_thunar() {
     local menus_file="$HOME/.config/Thunar/uca.xml"
     local accels_file="$HOME/.config/Thunar/accels.scm"
 
-    # Create directories if they don't exist
-    mkdir -p "$(dirname "$menus_file")"
+    check_and_create_directory "$(dirname "$menus_file")"
 
-    # Backup existing files
     check_and_backup "$menus_file"
     check_and_backup "$accels_file"
 
@@ -377,6 +376,14 @@ step_install_menus() {
         # The scripts folder structure is sufficient for menu creation
         echo "${R}[${G}✓${R}]${G} Nautilus scripts installed (no additional menu setup required)${NC}"
         ;;
+    "caja")
+        # Caja uses scripts directly like Nautilus
+        echo "${R}[${G}✓${R}]${G} Caja scripts installed (no additional menu setup required)${NC}"
+        ;;
+    "nemo")
+        # Nemo uses scripts directly like Nautilus
+        echo "${R}[${G}✓${R}]${G} Nemo scripts installed (no additional menu setup required)${NC}"
+        ;;
     "pcmanfm-qt")
         step_install_menus_pcmanfm
         ;;
@@ -385,16 +392,10 @@ step_install_menus() {
         step_install_menus_thunar
         step_install_shortcuts_thunar "$HOME/.config/Thunar/accels.scm"
         ;;
-    "caja")
-        step_install_shortcuts_gnome2 "$HOME/.config/caja/accels"
-        ;;
     esac
 }
 
 step_install_scripts() {
-    local tmp_install_dir=""
-
-    # 'Remove' previous scripts.
     echo "${R}[${G}-${R}]${G} Removing previous scripts...${NC}"
     check_and_delete "$INSTALL_DIR"
 
@@ -422,7 +423,7 @@ step_close_filemanager() {
             echo "${R}[${G}-${R}]${Y} No running instance of $FILE_MANAGER found.${NC}"
         fi
         ;;
-    "caja" | "thunar")
+    "caja" | "nemo" | "thunar")
         if pgrep -x "$FILE_MANAGER" &>/dev/null; then
             $FILE_MANAGER -q &>/dev/null || true &
         else
